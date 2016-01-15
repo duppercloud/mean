@@ -1,0 +1,33 @@
+{
+  "tools": [
+    {
+      "name": "mongodb"
+    },
+    {
+      "name": "nodejs"
+    },
+    {
+      "name": "npm"
+    },
+    {
+      "name": "npm-install",
+      "cmd": "ln -s /usr/bin/nodejs /usr/bin/node && npm install",
+      "watch": "package.json"
+    },
+    {
+      "name": "bower",
+      "cmd": "npm install -g bower",
+      "version": "latest"
+    },
+    { 
+      "name": "gulp",
+      "cmd": "npm install -g gulp",
+      "version": "latest"
+    },
+    {
+      "name": "bower-install",
+      "cmd": "bower install --allow-root",
+      "watch": "bower.json"
+    }
+  ]
+}
