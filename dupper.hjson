@@ -27,49 +27,50 @@
       "watch": "bower.json"
     }
   ],
+  commands: {
+    deploy: {
+      server:
+      '''
+         cd ~/mean
+         service mongodb start
+         PORT=8000 nohup gulp > deploy.out 2> deploy.err < /dev/null &
+      '''
+      client:
+      '''
+        echo "Waiting for server to start....."
+        while [ 1 ]; do
+          wget -q --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 --continue $hostname:8000 >/dev/null 2>&1
+          if [ $? = 0 ]; then break; fi;
+          sleep 5s;
+        done;
+        open http://$hostname:8000
+      '''
+    },
 
-  deploy: {
-    server:
-    '''
-       cd ~/mean
-       service mongodb start
-       PORT=8000 nohup gulp > deploy.out 2> deploy.err < /dev/null &
-    '''
-    client:
-    '''
-      echo "Waiting for server to start....."
-      while [ 1 ]; do
-        wget -q --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 --continue $hostname:8000 >/dev/null 2>&1
-        if [ $? = 0 ]; then break; fi;
-        sleep 5s;
-      done;
-      open http://$hostname:8000
-    '''
-  },
+    devenv: {
+      server:
+      '''
+        cp ~/mean/.gitignore ~/mean/.gutignore
+        ulimit -n 9999
+      '''
 
-  devenv: {
-    server:
-    '''
-      cp ~/mean/.gitignore ~/mean/.gutignore
-      ulimit -n 9999
-    '''
-
-    client:
-     '''
-       ssh-add -l &>/dev/null
-       if [ "$?" == 2 ]; then
-         test -r ~/.ssh-agent && \
-         eval "$(<~/.ssh-agent)" >/dev/null
-
+      client:
+       '''
          ssh-add -l &>/dev/null
          if [ "$?" == 2 ]; then
-           (umask 066; ssh-agent > ~/.ssh-agent)
+           test -r ~/.ssh-agent && \
            eval "$(<~/.ssh-agent)" >/dev/null
-           ssh-add
+
+           ssh-add -l &>/dev/null
+           if [ "$?" == 2 ]; then
+             (umask 066; ssh-agent > ~/.ssh-agent)
+             eval "$(<~/.ssh-agent)" >/dev/null
+             ssh-add
+           fi
          fi
-       fi
-       ssh-add $identityFile
-       gut sync $user@$hostname:$path $1
-     '''
-    }
+         ssh-add $identityFile
+         gut sync $user@$hostname:$path $1
+       '''
+      }
+  }
 }
