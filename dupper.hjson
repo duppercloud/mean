@@ -4,6 +4,7 @@
       "name": "apt-packages",
       "cmd":
       '''
+        apt-get update
         apt-get install -y mongodb nodejs
       '''
     },
