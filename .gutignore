@@ -73,9 +73,3 @@ mongod
 *.ntvs*
 *.njsproj
 *.sln
-
-
-# Visual Studio
-# ============
-.gut
-.gitignore
