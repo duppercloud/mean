@@ -4,7 +4,14 @@
       "name": "apt-packages",
       "cmd":
       '''
-        apt-get install -y mongodb nodejs npm
+        apt-get install -y mongodb nodejs
+      '''
+    },
+    {
+      "name": "apt-npm-package",
+      "cmd":
+      '''
+        apt-get install -y npm
       '''
     },
     {
