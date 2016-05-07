@@ -22,7 +22,7 @@
       "name": "bower-install",
       "cmd":
       '''
-        bower install --allow-root
+        if [[ -f bower.json ]]; then bower install --allow-root; fi  
       ''',
       "watch": "bower.json"
     }
