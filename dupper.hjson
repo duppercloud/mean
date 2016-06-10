@@ -4,7 +4,7 @@
       "name": "apt-packages",
       "cmd":
       '''
-        curl -sL https://deb.nodesource.com/setup | sudo bash -
+        curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
         apt-get install -y mongodb nodejs
       '''
     },
@@ -12,7 +12,6 @@
       "name": "npm-install",
       "cmd":
       '''
-        ln -s /usr/bin/nodejs /usr/bin/node
         npm install -g bower gulp
         npm install
       ''',
@@ -22,7 +21,7 @@
       "name": "bower-install",
       "cmd":
       '''
-        if [[ -f bower.json ]]; then bower install --allow-root; fi  
+        if [[ -f bower.json ]]; then bower install --allow-root; fi
       ''',
       "watch": "bower.json"
     }
@@ -69,6 +68,7 @@
            fi
          fi
          ssh-add $identityFile
+         ulimit -n 9999
          gut sync $user@$hostname:$path $1
        '''
       }
