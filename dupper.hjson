@@ -4,7 +4,7 @@
       "name": "apt-packages",
       "cmd":
       '''
-        curl -sL https://deb.nodesource.com/setup_0.12 | sudo -E bash -
+        curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
         apt-get install -y mongodb nodejs
       '''
     },
@@ -12,6 +12,7 @@
       "name": "npm-install",
       "cmd":
       '''
+        ln -s /usr/bin/nodejs /usr/bin/node
         npm install -g bower gulp
         npm install
       ''',
