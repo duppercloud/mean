@@ -4,17 +4,17 @@
       "name": "apt-packages",
       "cmd":
       '''
-        curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-        apt-get install -y mongodb nodejs
+        sudo curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+        sudo apt-get install -y mongodb nodejs
       '''
     },
     {
       "name": "npm-install",
       "cmd":
       '''
-        ln -s /usr/bin/nodejs /usr/bin/node
-        npm install -g bower gulp
-        npm install
+        sudo ln -s /usr/bin/nodejs /usr/bin/node
+        sudo npm install -g bower gulp
+        sudo npm install
       ''',
       "watch": "package.json"
     },
@@ -22,7 +22,10 @@
       "name": "bower-install",
       "cmd":
       '''
-        if [[ -f bower.json ]]; then bower install --allow-root; fi
+        if [[ -f bower.json ]] 
+        then 
+          sudo bower install --allow-root 
+        fi
       ''',
       "watch": "bower.json"
     }
@@ -32,8 +35,8 @@
       server:
       '''
          cd ~/mean
-         service mongodb start
-         PORT=8000 nohup gulp > deploy.out 2> deploy.err < /dev/null &
+         sudo service mongodb start
+         PORT=8000 screen -d -m gulp
       '''
       client:
       '''
