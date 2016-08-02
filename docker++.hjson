@@ -22,10 +22,7 @@
       "name": "bower-install",
       "cmd":
       '''
-        if [[ -f bower.json ]] 
-        then 
-          sudo bower install --allow-root 
-        fi
+        sudo bower install --allow-root 
       ''',
       "watch": "bower.json"
     }
