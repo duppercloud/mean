@@ -4,6 +4,7 @@
       "name": "apt-packages",
       "cmd":
       '''
+        $pkgmgr -y install curl 
         curl -sL https://deb.nodesource.com/setup_4.x | bash -
         $pkgmgr -y install mongodb nodejs npm
       '''
