@@ -17,14 +17,6 @@
         sudo npm install
       ''',
       "watch": "package.json"
-    },
-    {
-      "name": "bower-install",
-      "cmd":
-      '''
-        sudo bower install --allow-root 
-      ''',
-      "watch": "bower.json"
     }
   ],
   commands: {
