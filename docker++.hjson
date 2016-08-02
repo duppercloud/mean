@@ -4,17 +4,17 @@
       "name": "apt-packages",
       "cmd":
       '''
-        sudo curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
-        sudo $pkgmgr -y install mongodb nodejs npm
+        curl -sL https://deb.nodesource.com/setup_4.x | bash -
+        $pkgmgr -y install mongodb nodejs npm
       '''
     },
     {
       "name": "npm-install",
       "cmd":
       '''
-        sudo ln -s /usr/bin/nodejs /usr/bin/node
-        sudo npm install -g bower gulp
-        sudo npm install
+        ln -s /usr/bin/nodejs /usr/bin/node
+        npm install -g bower gulp
+        npm install
       ''',
       "watch": "package.json"
     }
@@ -24,7 +24,7 @@
       server:
       '''
          cd ~/mean
-         sudo service mongodb start
+         service mongodb start
          PORT=8000 screen -d -m gulp
       '''
       client:
