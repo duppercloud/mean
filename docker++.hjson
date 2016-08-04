@@ -42,11 +42,12 @@
          cd ~/mean
          cat >run.sh <<EOM
 #!/bin/bash
+
 cd ~/mean
 gulp > output
 EOM
          chmod a+x run.sh
-         PORT=8000 daemon ~/mean/run.sh
+         PORT=8000 daemon --name mean -P ~/mean ~/mean/run.sh
          set +x
       '''
       client:
