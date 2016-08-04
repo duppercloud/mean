@@ -1,4 +1,7 @@
 {
+  "ports": [
+  "8000:8000"
+  ]
   "dependencies": [
     {
       "name": "apt-packages",
@@ -6,14 +9,13 @@
       '''
         $pkgmgr -y install curl 
         curl -sL https://deb.nodesource.com/setup_4.x | bash -
-        $pkgmgr -y install mongodb nodejs npm
+        $pkgmgr -y install mongodb nodejs 
       '''
     },
     {
       "name": "npm-install",
       "cmd":
       '''
-        ln -s /usr/bin/nodejs /usr/bin/node
         npm install -g bower gulp
         npm install
       ''',
@@ -24,9 +26,10 @@
     deploy: {
       server:
       '''
-         cd ~/mean
+         set -x
          service mongodb start
-         PORT=8000 screen -d -m gulp
+         PORT=8000 script -q -c "screen -d -m gulp" 
+         set +x
       '''
       client:
       '''
