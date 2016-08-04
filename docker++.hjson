@@ -9,7 +9,7 @@
       '''
         $pkgmgr -y install curl 
         curl -sL https://deb.nodesource.com/setup_4.x | bash -
-        $pkgmgr -y install mongodb nodejs 
+        $pkgmgr -y install mongodb nodejs daemon
       '''
     },
     {
@@ -29,7 +29,8 @@
       '''
          set -x
          service mongodb start
-         PORT=8000 script -q -c "screen -d -m gulp" 
+         cd ~/mean
+         PORT=8000 daemon  -r ~/mean/run.sh
          set +x
       '''
       client:
