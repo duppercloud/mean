@@ -17,6 +17,7 @@
       "cmd":
       '''
         npm install -g bower gulp
+        cd ~/mean
         npm install
       ''',
       "watch": "package.json"
