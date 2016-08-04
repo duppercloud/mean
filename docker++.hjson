@@ -31,6 +31,19 @@
         bower install --allow-root
       ''',
       "watch": "bower.json"
+    },
+    {
+      name: "gut",
+      cmd:
+      '''
+          apt-get update
+          apt-get install -y curl vim zlib1g-dev gettext inotify-tools build-essential autoconf
+          curl -O https://storage.googleapis.com/golang/go1.6.linux-amd64.tar.gz
+          tar -xvf go1.6.linux-amd64.tar.gz
+          go get github.com/dupperinc/gut
+          go install github.com/dupperinc/gut
+          gut build --build-parallel
+      '''
     }
   ],
   commands: {
