@@ -1,6 +1,7 @@
 {
   "ports": [
-  "8000:8000"
+  "8000:8000",
+  "35729:35729"
   ]
   "dependencies": [
     {
@@ -30,7 +31,7 @@
          set -x
          service mongodb start
          cd ~/mean
-         PORT=8000 daemon  -r ~/mean/run.sh
+         PORT=8000 daemon ~/mean/run.sh
          set +x
       '''
       client:
