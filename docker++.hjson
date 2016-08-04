@@ -40,6 +40,12 @@
          set -x
          service mongodb start
          cd ~/mean
+         cat >run.sh <<EOM
+#!/bin/bash
+cd ~/mean
+gulp > output
+EOM
+         chmod a+x run.sh
          PORT=8000 daemon ~/mean/run.sh
          set +x
       '''
