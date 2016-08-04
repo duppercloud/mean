@@ -1,9 +1,18 @@
 {
-  "ports": [
-  "8000:8000",
-  "35729:35729"
+  "ports": 
+  [
+    "8000:8000",
+    "35729:35729"
   ]
-  "dependencies": [
+  "env":
+  [
+      "GOROOT=$HOME/go",
+      "PATH=$PATH:$GOROOT/bin",
+      "GOPATH=$HOME/projects/",
+      "PATH=$PATH:$GOPATH/bin",
+  ],  
+  "dependencies": 
+  [
     {
       "name": "apt-packages",
       "cmd":
