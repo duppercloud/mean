@@ -22,6 +22,15 @@
         npm install
       ''',
       "watch": "package.json"
+    },
+    {
+      "name": "bower-install",
+      "cmd":
+      '''
+        cd ~/mean
+        bower install --allow-root
+      ''',
+      "watch": "bower.json"
     }
   ],
   commands: {
