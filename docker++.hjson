@@ -21,7 +21,7 @@
       "cmd":
       '''
         $pkgmgr -y install curl 
-        curl -sL https://deb.nodesource.com/setup | bash -
+        curl -sL  https://deb.nodesource.com/setup_6.x | bash -
         $pkgmgr -y install mongodb nodejs daemon
       '''
     },
