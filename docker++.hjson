@@ -3,7 +3,9 @@
   [
     "8000:8000",
     "35729:35729",
-    "9418:9418" 
+    "9418:9418",
+    "8080:8080",
+    "3000:3000"
   ]
   "env":
   [
@@ -19,7 +21,7 @@
       "cmd":
       '''
         $pkgmgr -y install curl 
-        curl -sL https://deb.nodesource.com/setup_4.x | bash -
+        curl -sL https://deb.nodesource.com/setup | bash -
         $pkgmgr -y install mongodb nodejs daemon
       '''
     },
@@ -43,16 +45,28 @@
       "watch": "bower.json"
     },
     {
-      name: "gut",
-      cmd:
+      "name": "supervisor",
+      "cmd": 
       '''
-          apt-get update
-          apt-get install -y curl vim zlib1g-dev gettext inotify-tools build-essential autoconf
-          curl -O https://storage.googleapis.com/golang/go1.6.linux-amd64.tar.gz
-          tar -xvf go1.6.linux-amd64.tar.gz
-          go get github.com/dupperinc/gut
-          go install github.com/dupperinc/gut
-          gut build --build-parallel
+        apt-get install -y supervisor 
+        rm -rf /var/lib/apt/lists/*
+        sed -i 's/^\(\[supervisord\]\)$/\1\nnodaemon=true/' /etc/supervisor/supervisord.conf
+        update-rc.d supervisor defaults
+        apt-get update | apt-get upgrade -y
+        apt-get install libpam-cracklib -y
+        ln -s /lib/x86_64-linux-gnu/security/pam_cracklib.so /lib/security
+      '''
+    },
+    {
+      "name": "cloud 9",
+      "cmd":
+      '''
+        apt-get install -y build-essential g++ curl libssl-dev apache2-utils libxml2-dev sshfs
+        git clone https://github.com/c9/core.git cloud9
+        cd cloud9
+        scripts/install-sdk.sh
+        sed -i -e 's_127.0.0.1_0.0.0.0_g' /cloud9/configs/standalone.js 
+        
       '''
     }
   ],
@@ -85,30 +99,14 @@ EOM
       '''
     },
 
-    devenv: {
+    c9: {
       server:
       '''
-        cp ~/mean/.gitignore ~/mean/.gutignore
-        ulimit -n 9999
+        supervisord -c /etc/supervisor/supervisord.conf
       '''
-
       client:
        '''
-         ssh-add -l &>/dev/null
-         if [ "$?" == 2 ]; then
-           test -r ~/.ssh-agent && \
-           eval "$(<~/.ssh-agent)" >/dev/null
-
-           ssh-add -l &>/dev/null
-           if [ "$?" == 2 ]; then
-             (umask 066; ssh-agent > ~/.ssh-agent)
-             eval "$(<~/.ssh-agent)" >/dev/null
-             ssh-add
-           fi
-         fi
-         ssh-add $identityFile
-         ulimit -n 9999
-         gut sync $user@$hostname:$path $1
+        open http://$hostname:8080
        '''
       }
   }
