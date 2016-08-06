@@ -11,6 +11,7 @@
       "PATH=$PATH:$GOROOT/bin",
       "GOPATH=$HOME/projects/",
       "PATH=$PATH:$GOPATH/bin",
+      "TEST=test"
   ],  
   "dependencies": 
   [
@@ -72,34 +73,15 @@
     deploy: {
       server:
       '''
-         set -x
          service mongodb start
          cd ~/mean
-         cat >run.sh <<EOM
-#!/bin/bash
-
-cd ~/mean
-gulp > output
-EOM
-         chmod a+x run.sh
-         PORT=8000 daemon --name mean -P ~/mean ~/mean/run.sh
-         set +x
-      '''
-      client:
-      '''
-        echo "Waiting for server to start....."
-        while [ 1 ]; do
-          wget -q --retry-connrefused --waitretry=1 --read-timeout=20 --timeout=15 -t 0 --continue $hostname:8000 >/dev/null 2>&1
-          if [ $? = 0 ]; then break; fi;
-          sleep 5s;
-        done;
-        open http://$hostname:8000
+         PORT=3000 gulp
       '''
     },
-
     c9: {
       server:
       '''
+        cp ~/mean/conf/cloud9.conf /etc/supervisor/conf.d/
         supervisord -c /etc/supervisor/supervisord.conf
       '''
       }
