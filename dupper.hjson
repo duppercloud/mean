@@ -1,0 +1,209 @@
+{
+  ports: 
+  [
+    "35729:35729", // live reload
+    "3000:3000",   // mean stack
+    "8080:8080"    // node-inspector
+    "8000:8000",   // c9
+  ],  
+  env:
+  [
+    "NODE_ENV=development",
+    "PORT=3000",
+    "DISPLAY=:99.0"
+  ],
+  dependencies: 
+  [
+    {
+      name: "linux-dependencies",
+      cmd:
+      '''
+        apt-get -y install curl wget libfontconfig g++-4.8 gcc-4.8 clang
+        curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+        apt-get -y install mongodb nodejs daemon
+      '''
+    },
+    {
+      name: "nodejs-dependencies",
+      cmd:
+      '''
+        npm install -g bower gulp node-inspector
+        cd $REPO_ROOT
+        npm install
+        npm i nsp -g
+        npm install protractor
+
+      ''',
+      watch: "package.json"
+    },
+    {
+      name: "bower-dependencies",
+      cmd:
+      '''
+        cd $REPO_ROOT
+        bower install --allow-root
+      ''',
+      watch: "bower.json"
+    },
+    {
+      name: "gem-dependencies",
+      cmd:
+      '''
+          gem update --system
+          gem install sass --version "=3.3.7"
+      '''
+    },
+    {
+      name: "cloud-9-sdk-dependencies",
+      cmd:
+      '''    
+        apt-get install -y build-essential g++ curl libssl-dev apache2-utils libxml2-dev sshfs python2.7 python2.7-dev
+        git clone https://github.com/c9/core.git cloud9
+        cd cloud9
+        scripts/install-sdk.sh
+        sed -i -e 's_127.0.0.1_0.0.0.0_g' configs/standalone.js 
+      '''
+    }     
+  ],
+  commands: {
+    start: [{
+      server:
+      '''
+         # Check Mogodb service and start if not running
+         service mongodb status > /dev/null 2>&1
+         if [[ $? -ne 0 ]]
+         then
+            service mongodb start
+         fi
+
+         # Start Gulp as Daemon
+         PORT=3000 daemon --name="gulp" --output=gulp.out -F /var/run/gulp.pid -D $REPO_ROOT -X /usr/bin/gulp        
+
+         echo "MEAN stack ..... [ STARTING ]"
+         
+         # Check for Server start
+         timeout 20 bash -c -- "while true; do wget -q --retry-connrefused \
+         --waitretry=1 --read-timeout=20 --timeout=15 -t 0 --continue localhost:3000 >/dev/null 2>&1; \
+         if [ $? = 0 ]; then break; fi; sleep 2s; done"
+
+         # Report status
+         _exit_code=$?   
+         if [[ $_exit_code -eq 0 ]]
+         then
+             echo -e "MEAN stack ..... [ STARTED ]"
+         else
+             echo -e "MEAN stack ..... [ TIMEOUT ]"
+         fi
+
+         # Pass Status to client
+         _export _exit_code
+      '''
+    },{
+      client:
+      '''
+         # Open browser on Mac if server started successfully.
+         if [[ $_exit_code -eq 0 ]]
+         then
+             os="$(uname -s)"
+             if [[ $os == "Darwin" ]]; then
+                 echo -e "Opening Browser"
+                 open http://$SERVER_IP:3000/
+             fi        
+         fi
+      '''
+    }],
+    stop: [{
+      server:
+      '''
+          # Get group ID of Gulp daemon process
+          pgid=$(ps --no-headers -o pgid $(cat /var/run/gulp.pid))
+          pgid=$(echo $pgid | tr -d '[[:space:]]')
+
+          # Kill all group processes
+          pkill -1 -g $pgid
+
+          echo "MEAN stack ..... [ STOPPING ]"
+
+          # Check for termination and report status
+          timeout 5 bash -c -- "while true; do [ -f /var/run/gulp.pid ]; \
+          if [ $? -eq 0 ]; then break; fi; sleep 2s; done"
+          _exit_code=$?
+
+          if [[ $_exit_code -eq 0 ]]
+          then
+              echo -e "MEAN stack ..... [ STOPPED ]"
+          else
+              echo -e "MEAN stack ..... [ FAILED ]"
+          fi
+      '''
+    }],    
+    logs: [{
+      server:
+      '''
+          tail -n 1000 $REPO_ROOT/gulp.out
+      '''
+    }],    
+    debug: [{
+        server:
+        '''
+            # Start debugger in background detached from terminal
+            [ -f /var/run/gulp.pid ]
+            exit_code=$?
+            _export exit_code
+    
+            if [[ $exit_code -ne 0 ]]
+            then
+                echo "MEAN stack not running, start using below command:"
+                echo "Usage:"
+                echo "    dupper exec $REPO_NAME start"
+                exit 1
+            fi
+            
+            # Start debugger in background detached from terminal
+            daemon --name="node-inspector" --output=node-inspector.out -F /var/run/node-inspector.pid -D $REPO_ROOT -X /usr/bin/node \
+            /usr/bin/node-inspector -- --web-port=8080 --web-host=0.0.0.0
+            
+            exit_code="$?"
+            _export exit_code
+        '''
+      },{
+        client:
+        '''
+          os="$(uname -s)"
+          if [[ $os == "Darwin" ]]; then
+            [ $exit_code -eq 0 ] && open http://$SERVER_IP:8080/
+          fi        
+        '''
+    }],
+    test: [{
+        server:
+        '''
+            sh -e /etc/init.d/xvfb start
+            node_modules/protractor/bin/webdriver-manager update --standalone --firefox
+            node_modules/protractor/bin/webdriver-manager start 2>&1 &
+            nsp audit-package
+            grunt coverage
+        '''
+    }],    
+    c9: [{
+      server:
+      '''
+          # Start debugger in background detached from terminal
+          start-stop-daemon -b --start --quiet --oknodo \
+          --pidfile /var/run/c9.pid --exec $HOME/.c9/node/bin/node \
+          -- /root/cloud9/server.js --listen 0.0.0.0 --port 8000 -w $REPO_ROOT
+          exit_code=$?
+          _export exit_code
+      '''
+    },{
+      client:
+      '''
+         # Open browser on Mac if C9 started successfully
+          os="$(uname -s)"
+          if [[ $os == "Darwin" ]]; then
+              [ $exit_code -eq 0 ] && open http://$SERVER_IP:8000/  
+          fi        
+      '''
+    }]    
+  }
+}

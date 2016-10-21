@@ -1,3 +1,29 @@
+os:
+- linux
+
+sudo: required
+
+services:
+- docker
+
+before_install:
+- curl -sSL https://get.dupper.co | sudo sh
+- mkdir -p $HOME/.docker
+- openssl aes-256-cbc -K $encrypted_e798a517f5ca_key -iv $encrypted_e798a517f5ca_iv -in $TRAVIS_BUILD_DIR/config.json.enc -out $HOME/.docker/config.json -d
+
+install:
+- dupper --debug dup --name=mean -t --branch $TRAVIS_BRANCH --commit $TRAVIS_COMMIT --build https://github.com/$TRAVIS_REPO_SLUG
+- docker tag elk:$TRAVIS_COMMIT dupper/elk:$TRAVIS_COMMIT
+- docker push dupper/elk:$TRAVIS_COMMIT
+
+script:
+- dupper exec -t mean test
+
+after_success:
+- docker tag elk:$TRAVIS_COMMIT dupper/elk:$TRAVIS_BRANCH
+- docker push dupper/elk:$TRAVIS_BRANCH
+
+
 language: node_js
 sudo: false
 node_js:
